@@ -15,11 +15,27 @@ module Innkeeper
 			key = session['innkeeper.key']
 			return nil unless key
 
-			respond_to?(:deserialize) ? send(:deserialize, key) : key
+			if respond_to?(:deserialize)
+				send(:deserialize, key)
+			elsif key.split('--').size > 1
+				klass, id = key.split('--')
+				klass.constantize.where(:id => id).first
+			else
+				key
+			end
+		rescue
+			key
 		end
 
 		def store(obj)
-			session['innkeeper.key'] = respond_to?(:serialize) ? send(:serialize, obj) : obj
+			session['innkeeper.key'] = if respond_to?(:serialize)
+				send(:serialize, obj)
+			elsif obj.respond_to?(:id)
+				"#{obj.class.name}--#{obj.send(:id)}"
+			else
+				obj
+			end
+
 			obj
 		end
 	end

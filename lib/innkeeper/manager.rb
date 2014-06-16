@@ -11,9 +11,10 @@ module Innkeeper
 
 		def call(_env)
 			@env = _env
-			env['multidomain'] = ::Innkeeper::Proxy.new(self)
-			if env['multidomain'].halted?
-				env['multidomain'].fail!
+			env['innkeeper'] = ::Innkeeper::Proxy.new(self)
+
+			if env['innkeeper'].halted?
+				env['innkeeper'].fail!
 			else
 				@app.call(env)
 			end
@@ -27,7 +28,7 @@ module Innkeeper
 			::Innkeeper::SessionSerializer.send :define_method, :deserialize, &block
 		end
 
-		def self.infer_from_environment(&block)
+		def self.check_in(&block)
 			::Innkeeper::Proxy.send :define_method, :find_by_environment, &block
 		end
 	end

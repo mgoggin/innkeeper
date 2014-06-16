@@ -12,19 +12,19 @@ module Innkeeper
 			@halted = false
 
 			if respond_to?(:find_by_environment)
-				_domain = send(:find_by_environment, request)
-				halt! unless _domain
-				send("domain=".to_sym, _domain)
+				_tenant = send(:find_by_environment, request)
+				halt! unless _tenant
+				send("tenant=", _tenant)
 			end
 		end
 
-		def domain
-			@_domain ||= session_serializer.fetch
+		def tenant
+			@_tenant ||= session_serializer.fetch
 		end
 
-		def domain=(obj)
+		def tenant=(obj)
 			return unless obj
-			@_domain = session_serializer.store(obj)
+			@_tenant = session_serializer.store(obj)
 		end
 
 		def session_serializer
@@ -35,10 +35,16 @@ module Innkeeper
 			@halted
 		end
 
+		def skip!
+			manager.app.call(env)
+		end
+
 		def fail!
 			halt!
 			if config.require_infer && config.failure_app.respond_to?(:call)
 				config.failure_app.call(request)
+			else
+				manager.app.call(env)
 			end
 		end
 

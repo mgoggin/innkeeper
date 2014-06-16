@@ -21,8 +21,8 @@ module Innkeeper
 			self[:require_infer] ||= false
 		end
 
-		def infer_from_environment(*args, &block)
-			::Innkeeper::Manager.infer_from_environment(*args, &block)
+		def check_in(*args, &block)
+			::Innkeeper::Manager.check_in(*args, &block)
 		end
 
 		def serialize_into_session(*args, &block)
