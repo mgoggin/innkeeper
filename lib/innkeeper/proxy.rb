@@ -1,4 +1,4 @@
-require 'ipaddress'
+require 'ipaddr'
 
 module Innkeeper
 	class Proxy
@@ -14,7 +14,7 @@ module Innkeeper
 			@manager = manager
 			@halted = false
 
-			unless IPAddress.valid?(request.host)
+			unless is_ip_address?(request.host)
 				domain_parts = request.host.split('.')
 
 				if domain_parts.size > 2
@@ -78,6 +78,15 @@ module Innkeeper
 		private
 		def redirect!(uri, code = 302)
 			[code, { 'Location' => "#{uri}" }, []]
+		end
+
+		def is_ip_address?(host)
+			begin
+				IPAddr.new host
+				return true
+			rescue
+				return false
+			end
 		end
 	end
 end
