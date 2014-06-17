@@ -14,11 +14,12 @@ module Innkeeper
 			end
 		end
 
-		hash_accessor :failure_app, :require_infer
+		hash_accessor :failure_app, :require_infer, :redirect_on_failure
 
 		def initialize(other = {})
 			merge!(other)
 			self[:require_infer] ||= false
+			self[:redirect_on_failure] ||= nil
 		end
 
 		def check_in(*args, &block)
