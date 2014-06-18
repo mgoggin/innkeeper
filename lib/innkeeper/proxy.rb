@@ -51,6 +51,7 @@ module Innkeeper
 
 		def skip!
 			manager.app.call(env)
+			nil
 		end
 
 		def fail!
