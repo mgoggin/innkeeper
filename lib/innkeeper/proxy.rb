@@ -13,6 +13,7 @@ module Innkeeper
 		def initialize(manager)
 			@manager = manager
 			@halted = false
+      @skip = false
 
 			unless is_ip_address?(request.host)
 				domain_parts = request.host.split('.')
@@ -27,7 +28,7 @@ module Innkeeper
 
 			if respond_to?(:find_by_environment)
 				_tenant = send(:find_by_environment, subdomain, host_domain, request)
-				halt! unless _tenant
+				halt! if _tenant.nil? && !skip?
 				send("tenant=", _tenant)
 			end
 		end
@@ -50,9 +51,13 @@ module Innkeeper
 		end
 
 		def skip!
-			manager.app.call(env)
+			@skip = true
 			nil
 		end
+
+    def skip?
+      @skip
+    end
 
 		def fail!
 			halt!
@@ -74,6 +79,7 @@ module Innkeeper
 
 		def halt!
 			@halted = true
+      nil
 		end
 
 		private
