@@ -13,7 +13,9 @@ module Innkeeper
 			@env = _env
 			env['innkeeper'] = ::Innkeeper::Proxy.new(self)
 
-			if env['innkeeper'].present? && env['innkeeper'].halted?
+			if env['innkeeper'].present? && env['innkeeper'].halted? && env['innkeeper'].tenant.is_a?(Array)
+				env['innkeeper'].tenant
+			elsif env['innkeeper'].present? && env['innkeeper'].halted?
 				env['innkeeper'].fail!
 			else
 				@app.call(env)
